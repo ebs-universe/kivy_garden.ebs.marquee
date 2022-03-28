@@ -12,7 +12,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 URL = 'https://github.com/ebs-universe/kivy_garden.ebs.marquee'
 
 setup(
-    name='kivy_garden.ebs.core',
+    name='kivy_garden.ebs.marquee',
     description='Marquee text widget for Kivy',
     long_description=long_description,
     long_description_content_type='text/markdown',
