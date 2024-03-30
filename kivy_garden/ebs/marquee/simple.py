@@ -30,6 +30,8 @@ class MarqueeLabel(ScrollView):
         text = kwargs.pop('text')
         self._label_params = kwargs
         self.text = text
+        self._callback = None
+        self._loop = None
 
     def update_widths(self):
         width = self._lspacer.width + \
@@ -76,27 +78,25 @@ class MarqueeLabel(ScrollView):
         self.add_widget(self._layout)
         self.update_widths()
 
-    def start(self, loop=True):
+    def start(self, loop=True, callback=None):
+        self._callback = callback
+        self._loop = loop
         speed = 75
         scroll_distance = self._layout.width - self._lspacer.width
         duration = scroll_distance / speed
-        # print("Scroll was", self.scroll_x)
         self.scroll_x = 0
-        # print("Using duration", duration)
         self._animation = Animation(scroll_x=1, duration=duration)
-        if loop:
-            self._animation.bind(on_complete=self._check_complete)
-            pass
+        self._animation.bind(on_complete=self._check_complete)
         self._animation.start(self)
 
     def _check_complete(self, animation, instance):
-        # print(instance.scroll_x)
-        # print(self._mainlabels[-1].x + self._mainlabels[-1].width)
         if instance.scroll_x > 0.95:
-            # print("Repeating")
             self._animation.unbind(on_scroll=self._check_complete)
             animation.stop(self)
-            self.start()
+            if self._loop:
+                self.start()
+            elif self._callback:
+                self._callback()
 
     def stop(self):
         self._animation.unbind(on_scroll=self._check_complete)
