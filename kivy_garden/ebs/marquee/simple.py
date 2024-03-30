@@ -8,19 +8,23 @@ from kivy.uix.scrollview import ScrollView
 from kivy.core.window import Window
 from kivy.animation import Animation
 from kivy.properties import NumericProperty
+from kivy.properties import ListProperty
 
 from kivy_garden.ebs.core.colors import ColorBoxLayout
 
 
 class MarqueeLabel(ScrollView):
     spacer_width = NumericProperty(None)
+    bgcolor = ListProperty([1, 1, 1, 1])
+    color = ListProperty([1, 1, 1, 1])
 
     def __init__(self, **kwargs):
-        bgcolor = kwargs.pop('bgcolor')
+        self.bgcolor = kwargs.pop('bgcolor')
+        self.color = kwargs.pop('color')
         ScrollView.__init__(self, bar_width=0)
 
         self._layout = ColorBoxLayout(size_hint_x=None,
-                                      bgcolor=bgcolor,
+                                      bgcolor=self.bgcolor,
                                       orientation='horizontal')
         self._mainlabels = []
         self._lspacer = Widget(size_hint_x=None, width=Window.width)
@@ -32,6 +36,14 @@ class MarqueeLabel(ScrollView):
         self.text = text
         self._callback = None
         self._loop = None
+
+    def on_bgcolor(self, _, value):
+        if self._layout:
+            self._layout.bgcolor = value
+
+    def on_color(self, _, value):
+        for x in self._mainlabels:
+            x.color = value
 
     def update_widths(self):
         width = self._lspacer.width + \
@@ -67,7 +79,7 @@ class MarqueeLabel(ScrollView):
 
         self._mainlabels = []
         for t in texts:
-            l = Label(text=t, size_hint_x=None,
+            l = Label(text=t, size_hint_x=None, color=self.color,
                       text_size=(None, None), **self._label_params)
             self._layout.add_widget(l)
             l.bind(texture_size=self._set_mainlabel_width)
